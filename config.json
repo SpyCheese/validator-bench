@@ -1,7 +1,7 @@
 {
   "ton_bin": "/usr/bin/ton/",
   "fift_lib_path": "/usr/src/ton/crypto/fift/lib/",
-  "smartcont_path": "/usr/src/ton/ton/crypto/smartcont/",
+  "smartcont_path": "/usr/src/ton/crypto/smartcont/",
   "work_dir": "/var/validator-benchmark/",
   "node": {
     "adnl_port": 61001,
