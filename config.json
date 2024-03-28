@@ -1,0 +1,26 @@
+{
+  "ton_bin": "/usr/bin/ton/",
+  "fift_lib_path": "/usr/src/ton/crypto/fift/lib/",
+  "smartcont_path": "/usr/src/ton/ton/crypto/smartcont/",
+  "work_dir": "/var/validator-benchmark/",
+  "node": {
+    "adnl_port": 61001,
+    "liteserver_port": 61002,
+    "console_port": 61003,
+    "threads": 8,
+    "verbosity": 1
+  },
+  "blockchain": {
+    "split": 3,
+    "lim_mul": 1.0
+  },
+  "benchmark": {
+    "sharding_timeout": 300.0,
+    "max_retranslators": 1024,
+    "spam_chains": 20,
+    "spam_split_hops": 7,
+    "spam_preference": 1.0,
+    "spam_preliminary_wait": 120.0,
+    "benchmark_duration": 600.0
+  }
+}
