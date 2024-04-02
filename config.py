@@ -29,7 +29,8 @@ LITESERVER_PORT: int = config_json["node"]["liteserver_port"]
 CONSOLE_PORT: int = config_json["node"]["console_port"]
 
 NODE_FLAGS: list[str] = ["--threads", str(config_json["node"]["threads"]), "--verbosity",
-                         str(config_json["node"]["verbosity"])]
+                         str(config_json["node"]["verbosity"]), "--celldb-compress-depth",
+                         str(config_json["node"].get("celldb_compress_depth", 0))]
 
 SHARDING_TIMEOUT: float = config_json["benchmark"]["sharding_timeout"]
 BENCHMARK_DURATION: float = config_json["benchmark"]["benchmark_duration"]

@@ -3,7 +3,7 @@ from config import *
 
 RETRANSLATOR_SOURCE_TEMPLATE = """
 {-
-  _# id:uint16 seqno:uint32 public_key:uint256 code:^Cell = Storage;
+  _# id:uint16/32/64 seqno:uint32 public_key:uint256 code:^Cell = Storage;
 -}
 
 const workchain = 0;
@@ -21,12 +21,12 @@ int get_max_shard_depth() inline {
 
 (int, int, int, cell) load_data () inline {
   slice ds = get_data().begin_parse();
-  return (ds~load_uint(16), ds~load_uint(32), ds~load_uint(256), ds.preload_ref());
+  return (ds~load_uint({{acc_id_len}}), ds~load_uint(32), ds~load_uint(256), ds.preload_ref());
 }
 
 cell pack_data(int id, int seqno, int public_key, cell code) inline {
   return begin_cell()
-                     .store_uint(id, 16)
+                     .store_uint(id, {{acc_id_len}})
                      .store_uint(seqno, 32)
                      .store_uint(public_key, 256)
                      .store_ref(code)
@@ -83,7 +83,7 @@ slice calc_address(cell init_state) inline {
     .store_uint(4 + 2 + 1, 1 + 4 + 4 + 64 + 32 + 1 + 1 + 1)
     .store_ref(next_hop_initstate);
   var msg_body = begin_cell()
-    .store_uint(id, 16)
+    .store_uint(id, {{acc_id_len}})
     .store_uint(remaining_hops, 16)
     .store_uint(split_hops, 8)
     .store_uint(preference, 16)
@@ -102,7 +102,7 @@ slice calc_address(cell init_state) inline {
 }
 
 {-
-    retransalate#_ id:uint16 remaining_hops:uint16 split_hops:uint8 preference:uint16 payload:Cell = IntMsgBody;
+    retransalate#_ id:uint16/32/64 remaining_hops:uint16 split_hops:uint8 preference:uint16 payload:Cell = IntMsgBody;
 -}
 
 () main (int msg_value, cell in_msg_full, slice in_msg_body) {
@@ -119,7 +119,7 @@ slice calc_address(cell init_state) inline {
     return ();
   }
   slice sender_address = cs~load_msg_addr();
-  int sender_id = in_msg_body~load_uint(16);
+  int sender_id = in_msg_body~load_uint({{acc_id_len}});
 
   (int id, _, int public_key, cell code) = load_data();
   
@@ -207,7 +207,7 @@ START_SPAM_FIF_TEMPLATE = """
 "wallet-retranslator.pk" load-generate-keypair 
 =: privkey
 =: pubkey
-<b 0 16 u, 0 32 u, pubkey B, contract_code .s ref, b> =: contract_storage
+<b 0 {{acc_id_len}} u, 0 32 u, pubkey B, contract_code .s ref, b> =: contract_storage
 
 <b b{00110} s, contract_code ref, contract_storage ref, b>
 dup =: state_init
@@ -236,9 +236,18 @@ init_message hashu privkey ed25519_sign_uint =: signature
 """
 
 
+def get_acc_id_len():
+    x = config_json["benchmark"]["max_retranslators"]
+    for y in (16, 32, 64):
+        if x <= 2 ** y:
+            return y
+    raise Exception("max_retranslators is too big")
+
+
 def compile_retranslator():
     src = RETRANSLATOR_SOURCE_TEMPLATE
     src = src.replace("{{max_retranslators}}", str(config_json["benchmark"]["max_retranslators"]))
+    src = src.replace("{{acc_id_len}}", str(get_acc_id_len()))
     utils.run_cmd([FUNC_BIN, "-PAI", os.path.join(SMARTCONT_PATH, "stdlib.fc"), "-o", "retranslator.fif"],
                   stdin=src)
 
@@ -246,10 +255,11 @@ def compile_retranslator():
 def prepare_retranslator() -> str:
     compile_retranslator()
     fif = START_SPAM_FIF_TEMPLATE
+    fif = fif.replace("{{acc_id_len}}", str(get_acc_id_len()))
     fif = fif.replace("{{chains}}", str(config_json["benchmark"]["spam_chains"]))
     fif = fif.replace("{{split_hops}}", str(config_json["benchmark"]["spam_split_hops"]))
     fif = fif.replace("{{preference}}",
-                str(min(65535, max(0, int(config_json["benchmark"]["spam_preference"] * 65535)))))
+                      str(min(65535, max(0, int(config_json["benchmark"]["spam_preference"] * 65535)))))
     res = utils.fift(fif)
     for s in res.split("\n"):
         if s.startswith("retranslator_address"):

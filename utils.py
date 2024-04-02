@@ -57,13 +57,20 @@ def validator_console(cmd: str) -> str:
 def validator_engine() -> subprocess.Popen:
     cmd = [VALIDATOR_ENGINE_BIN, "-C", global_config.GLOBAL_CONFIG_FILENAME, "--db", "ton-work/db/", "--logname",
            "ton-work/logs/node.log"] + NODE_FLAGS
-    logging.debug("Running command in background: `%s`" % " ".join(cmd))
+    logging.info("Running node: `%s`" % " ".join(cmd))
     proc = subprocess.Popen(cmd)
     atexit.register(lambda: proc.kill())
     return proc
 
 
-def lite_client(cmd: str, allow_error: bool = False) -> str:
-    return run_cmd(
-        [LITE_CLIENT_BIN, "-v", "0", "-C", global_config.GLOBAL_CONFIG_FILENAME, "-r", "-c", cmd],
-        allow_error=allow_error, timeout=3.0)
+def lite_client(cmd: str, allow_error: bool = False, retries: int = 10) -> str:
+    while True:
+        try:
+            return run_cmd(
+                [LITE_CLIENT_BIN, "-v", "0", "-C", global_config.GLOBAL_CONFIG_FILENAME, "-r", "-c", cmd],
+                allow_error=allow_error, timeout=10.0)
+        except Exception as e:
+            if retries == 0:
+                raise
+            logging.info("lite-client `%s` error, retrying: %s" % (cmd, e))
+            retries -= 1

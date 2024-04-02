@@ -23,7 +23,8 @@ Edit `config.json` file:
     "liteserver_port": 61002,
     "console_port": 61003,
     "threads": 8,
-    "verbosity": 1
+    "verbosity": 1,
+    "celldb_compress_depth": 0
   },
   "blockchain": {
     "split": 3,
@@ -43,7 +44,7 @@ Edit `config.json` file:
 
 1. `ton_bin`, `fift_lib_path`, `smartcont_path` - set to your TON installation directories.
 2. `work_dir` - directory for the database. *Note that the script wipes this directory on startup*.
-3. `node`: set `threads` and `verbosity` to desired values.
+3. `node`: set `threads`, `verbosity`, `celldb_compress_depth` to desired values.
 4. `blockchain`:
     1. `split` - min and max split for the basechain. The number of shards will be `2^split`.
     2. `lim_mul` - multiplier for the block limits relative to the standard limits (i.e. `lim_mul=1` means the limits
@@ -60,7 +61,7 @@ The benchmark runs in the following way:
 3. Start transactions.
     1. Transactions are executed in basechain.
     2. Transactions are executed on a special smart-contract (retranslator).
-    3. The number of retranslators is `max_retranslators`.
+    3. The number of retranslators is `max_retranslators` (up to `2^64`).
     4. `spam_chains * 2^spam_split_hops` chains of transactions are executed.
     5. `spam_preference` controls the proportion of cross-shard transactions. `1` means that all transactions have
        source and destination in the same shard. `0` means that all destinations are random.

@@ -8,7 +8,8 @@
     "liteserver_port": 61002,
     "console_port": 61003,
     "threads": 8,
-    "verbosity": 1
+    "verbosity": 1,
+    "celldb_compress_depth": 0
   },
   "blockchain": {
     "split": 3,

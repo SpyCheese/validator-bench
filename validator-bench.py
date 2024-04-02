@@ -126,7 +126,7 @@ def do_benchmark():
     timeout = time.time() + 60.0
     while True:
         time.sleep(5.0)
-        res = utils.lite_client("getaccount " + retranslator_addr)
+        res = utils.lite_client("getaccount " + retranslator_addr, allow_error=True)
         if "account balance is" in res:
             break
         if time.time() > timeout:
