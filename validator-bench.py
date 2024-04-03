@@ -44,7 +44,7 @@ def prepare_net():
 def prepare_node():
     logging.info("Running validator-engine for the first time")
     utils.run_cmd([VALIDATOR_ENGINE_BIN, "-C", global_config.GLOBAL_CONFIG_FILENAME, "--db", "ton-work/db/", "--ip",
-                   "127.0.0.1:%d" % ADNL_PORT] + NODE_FLAGS, timeout=3.0)
+                   "127.0.0.1:%d" % ADNL_PORT] + get_node_flags(), timeout=3.0)
     logging.info("Initializing validator console")
     server_id_hex, server_id_base64 = utils.generate_random_id("keys", "server")
     _, client_id_base64 = utils.generate_random_id("keys", "client")

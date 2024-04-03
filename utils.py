@@ -56,7 +56,7 @@ def validator_console(cmd: str) -> str:
 
 def validator_engine() -> subprocess.Popen:
     cmd = [VALIDATOR_ENGINE_BIN, "-C", global_config.GLOBAL_CONFIG_FILENAME, "--db", "ton-work/db/", "--logname",
-           "ton-work/logs/node.log"] + NODE_FLAGS
+           "ton-work/logs/node.log"] + get_node_flags()
     logging.info("Running node: `%s`" % " ".join(cmd))
     proc = subprocess.Popen(cmd)
     atexit.register(lambda: proc.kill())

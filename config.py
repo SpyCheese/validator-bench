@@ -28,9 +28,19 @@ ADNL_PORT: int = config_json["node"]["adnl_port"]
 LITESERVER_PORT: int = config_json["node"]["liteserver_port"]
 CONSOLE_PORT: int = config_json["node"]["console_port"]
 
-NODE_FLAGS: list[str] = ["--threads", str(config_json["node"]["threads"]), "--verbosity",
-                         str(config_json["node"]["verbosity"]), "--celldb-compress-depth",
-                         str(config_json["node"].get("celldb_compress_depth", 0))]
-
 SHARDING_TIMEOUT: float = config_json["benchmark"]["sharding_timeout"]
 BENCHMARK_DURATION: float = config_json["benchmark"]["benchmark_duration"]
+
+
+def get_node_flags() -> list[str]:
+    node_cfg = config_json["node"]
+    flags = ["--threads", str(config_json["node"]["threads"]), "--verbosity",
+             str(node_cfg["verbosity"]), "--celldb-compress-depth",
+             str(config_json["node"].get("celldb_compress_depth", 0))]
+    if config_json["node"].get("simulate_serializer", False):
+        flags.append("--bench-simulate-serializer")
+    x = config_json["node"].get("duplicate_collate_query", 0.0)
+    if x > 0.0:
+        flags.append("--bench-duplicate-collate-query")
+    flags.append(str(x))
+    return flags

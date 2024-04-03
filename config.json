@@ -9,7 +9,9 @@
     "console_port": 61003,
     "threads": 8,
     "verbosity": 1,
-    "celldb_compress_depth": 0
+    "celldb_compress_depth": 0,
+    "simulate_serializer": false,
+    "duplicate_collate_query": 0.0
   },
   "blockchain": {
     "split": 3,
