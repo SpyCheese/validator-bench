@@ -127,3 +127,15 @@ def count_stats(result_json: dict, start_time: float, end_time: float):
 
     result_json["stats_base"] = base_stats.to_json()
     result_json["stats_mc"] = master_stats.to_json()
+
+
+def get_total_queues_size() -> int:
+    res = utils.lite_client("msgqueuesizes")
+    i = res.find("Outbound message queue sizes:")
+    if i == -1:
+        raise Exception("Unexpected msgqueuesizes output: " + res)
+    total = 0
+    for s in res[i:].split("\n"):
+        if s.startswith("(0,"):
+            total += int(s.split()[1])
+    return total

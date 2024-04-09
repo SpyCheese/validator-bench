@@ -139,11 +139,26 @@ def do_benchmark():
     logging.info("Benchmark started, waiting for %.1fs" % BENCHMARK_DURATION)
     bench_start = time.time()
     result_json["benchmark_start_time"] = bench_start
-    time.sleep(BENCHMARK_DURATION)
     bench_end = bench_start + BENCHMARK_DURATION
     result_json["benchmark_end_time"] = bench_end
-    logging.info("Benchmark ended")
 
+    result_json["queue_sizes"] = []
+    done = False
+    while True:
+        queue_size = counter.get_total_queues_size()
+        logging.info("Current msg queue size: %d" % queue_size)
+        now = time.time()
+        result_json["queue_sizes"].append({"time": now, "size": queue_size})
+        if done:
+            break
+        remaining = max(0.0, bench_end - now)
+        if remaining < 30.0:
+            time.sleep(remaining)
+            done = True
+        else:
+            time.sleep(30.0)
+
+    logging.info("Benchmark ended")
     logging.info("BENCHMARK PHASE 3: Collecting results")
     logging.info("Stopping transactions")
     spam.stop_spam()
