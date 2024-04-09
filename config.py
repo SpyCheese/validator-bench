@@ -42,5 +42,5 @@ def get_node_flags() -> list[str]:
     x = config_json["node"].get("duplicate_collate_query", 0.0)
     if x > 0.0:
         flags.append("--bench-duplicate-collate-query")
-    flags.append(str(x))
+        flags.append(str(x))
     return flags
