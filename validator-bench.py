@@ -42,6 +42,9 @@ def prepare_net():
 
 
 def prepare_node():
+    validator_version = utils.run_cmd([VALIDATOR_ENGINE_BIN, "--version"]).strip()
+    logging.info("Node version: " + validator_version)
+    result_json["node_version"] = validator_version.strip()
     logging.info("Running validator-engine for the first time")
     utils.run_cmd([VALIDATOR_ENGINE_BIN, "-C", global_config.GLOBAL_CONFIG_FILENAME, "--db", "ton-work/db/", "--ip",
                    "127.0.0.1:%d" % ADNL_PORT] + get_node_flags(), timeout=3.0)
@@ -160,6 +163,8 @@ def do_benchmark():
 
     logging.info("Benchmark ended")
     logging.info("BENCHMARK PHASE 3: Collecting results")
+    logging.info("Wait for 30s")
+    time.sleep(30.0)
     logging.info("Stopping transactions")
     spam.stop_spam()
     logging.info("Computing stats")
