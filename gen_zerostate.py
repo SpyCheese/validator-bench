@@ -141,7 +141,7 @@ Masterchain swap
  *
  */
 // version capabilities
-6 capCreateStats capBounceMsgBody or capReportVersion or capShortDequeue or config.version!
+9 capCreateStats capBounceMsgBody or capReportVersion or capShortDequeue or 64 or 128 or config.version!
 // max-validators max-main-validators min-validators
 1000 10 1 config.validator_num!
 // min-stake max-stake min-total-stake max-factor
